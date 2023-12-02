@@ -6,13 +6,13 @@
 #include "vm/swap.h"
 
 struct list frame_table;
-// struct lock ft_lock;
+struct lock ft_lock;
 
 void
 frame_table_init(void)
 {
   list_init(&frame_table);
-  // lock_init(&ft_lock);
+  lock_init(&ft_lock);
 }
 
 void
@@ -94,7 +94,7 @@ find_victim(void) {
 
 void*
 lru_clock_algorithm(enum palloc_flags flags) {
-  // lock_acquire(&ft_lock);
+  lock_acquire(&ft_lock);
   struct frame *victim_frame = list_entry(find_victim(), struct frame, ft_elem);
   struct thread *victim_thread = victim_frame->owner_thread;
   struct vm_entry *victim_vme = victim_frame->vme;
@@ -116,6 +116,6 @@ lru_clock_algorithm(enum palloc_flags flags) {
   }
 
   _free_frame(victim_frame);
+  lock_release(&ft_lock);
   return palloc_get_page(flags);
-  // lock_release(&ft_lock);
 }
