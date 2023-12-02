@@ -628,9 +628,6 @@ bool
 handle_mm_fault (struct vm_entry *vme)
 {
   struct frame *new_frame = palloc_frame(PAL_USER);
-  if (new_frame != NULL) {
-    free_frame (new_frame->kaddr);
-  }
   new_frame->vme = vme;
 
   if (new_frame->kaddr == NULL) {
