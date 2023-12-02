@@ -3,8 +3,9 @@
 #include <syscall-nr.h>
 #include "threads/interrupt.h"
 #include "threads/thread.h"
-#include "userprog/pagedir.h"
 #include "threads/vaddr.h"
+#include "threads/malloc.h"
+#include "userprog/pagedir.h"
 #include "devices/shutdown.h"
 #include "userprog/process.h"
 #include "filesys/filesys.h"
@@ -413,7 +414,7 @@ do_munmap(struct mmap_file *mmap_file)
 
   for (e = list_begin (&mmap_file->vme_list); e != list_end (&mmap_file->vme_list);/*list_next(e)*/) {
     struct vm_entry *vme = list_entry (e, struct vm_entry, mmap_elem);
-    struct list_elem *temp;
+    // struct list_elem *temp;
 
     if (vme->is_loaded == true) {
       addr = pagedir_get_page(cur->pagedir, vme->vaddr);
