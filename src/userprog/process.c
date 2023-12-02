@@ -649,6 +649,9 @@ handle_mm_fault (struct vm_entry *vme)
       break;
     case VM_ANON:
       swap_in(vme->swap_slot, new_frame->kaddr);
+      if (new_frame->owner_thread->pagedir == NULL) {
+        ASSERT("그라면 안돼");
+      }
       break;
     // case VM_STACK:
     //   break;
