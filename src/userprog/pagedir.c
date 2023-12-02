@@ -106,6 +106,9 @@ pagedir_set_page (uint32_t *pd, void *upage, void *kpage, bool writable)
   ASSERT (vtop (kpage) >> PTSHIFT < init_ram_pages);
   ASSERT (pd != init_page_dir);
 
+  if (pd == NULL)
+    PANIC("pagedir_set_page에서 에러남");
+
   pte = lookup_page (pd, upage, true);
 
   if (pte != NULL) 
@@ -128,6 +131,9 @@ pagedir_get_page (uint32_t *pd, const void *uaddr)
   uint32_t *pte;
 
   ASSERT (is_user_vaddr (uaddr));
+
+  if (pd == NULL)
+    PANIC("pagedir_get_page 에러남");
   
   pte = lookup_page (pd, uaddr, false);
   if (pte != NULL && (*pte & PTE_P) != 0)
@@ -148,6 +154,9 @@ pagedir_clear_page (uint32_t *pd, void *upage)
   ASSERT (pg_ofs (upage) == 0);
   ASSERT (is_user_vaddr (upage));
 
+  if (pd == NULL)
+    PANIC("pagedir_clear_page 에러남");
+
   pte = lookup_page (pd, upage, false);
   if (pte != NULL && (*pte & PTE_P) != 0)
     {
@@ -163,6 +172,9 @@ pagedir_clear_page (uint32_t *pd, void *upage)
 bool
 pagedir_is_dirty (uint32_t *pd, const void *vpage) 
 {
+  if (pd == NULL)
+    PANIC("pagedir_is_dirty 에러남");
+  
   uint32_t *pte = lookup_page (pd, vpage, false);
   return pte != NULL && (*pte & PTE_D) != 0;
 }
@@ -172,6 +184,10 @@ pagedir_is_dirty (uint32_t *pd, const void *vpage)
 void
 pagedir_set_dirty (uint32_t *pd, const void *vpage, bool dirty) 
 {
+
+  if (pd == NULL)
+    PANIC("pagedir_set_dirty 에러남");
+
   uint32_t *pte = lookup_page (pd, vpage, false);
   if (pte != NULL) 
     {
@@ -192,6 +208,9 @@ pagedir_set_dirty (uint32_t *pd, const void *vpage, bool dirty)
 bool
 pagedir_is_accessed (uint32_t *pd, const void *vpage) 
 {
+  if (pd == NULL)
+    PANIC("pagedir_is_accessed 에러남");
+
   uint32_t *pte = lookup_page (pd, vpage, false);
   return pte != NULL && (*pte & PTE_A) != 0;
 }
@@ -201,6 +220,9 @@ pagedir_is_accessed (uint32_t *pd, const void *vpage)
 void
 pagedir_set_accessed (uint32_t *pd, const void *vpage, bool accessed) 
 {
+  if (pd == NULL)
+    PANIC("pagedir_set_accessed 에러남");
+
   uint32_t *pte = lookup_page (pd, vpage, false);
   if (pte != NULL) 
     {

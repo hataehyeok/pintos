@@ -578,6 +578,7 @@ setup_stack (void **esp)
   kpage = palloc_frame (PAL_USER | PAL_ZERO);
   if (kpage != NULL) 
     {
+      add_frame_to_frame_table(kpage);
       success = install_page (((uint8_t *) PHYS_BASE) - PGSIZE, kpage->kaddr, true);
       if (success)
         *esp = PHYS_BASE;
@@ -627,6 +628,9 @@ bool
 handle_mm_fault (struct vm_entry *vme)
 {
   struct frame *new_frame = palloc_frame(PAL_USER);
+  if (new_frame != NULL) {
+    free_frame (new_frame->kaddr);
+  }
   new_frame->vme = vme;
 
   if (new_frame->kaddr == NULL) {
@@ -661,7 +665,7 @@ handle_mm_fault (struct vm_entry *vme)
     return false;
   }
   
+  add_frame_to_frame_table(new_frame);
   vme->is_loaded = true;
   return true;
 }
-  

@@ -44,7 +44,10 @@ palloc_frame (enum palloc_flags flags)
     frame->kaddr = lru_clock_algorithm(flags);
   }
 
-  add_frame_to_frame_table(frame);
+  // add_frame_to_frame_table(frame);
+  if (frame->kaddr == NULL || frame->owner_thread == NULL || frame->owner_thread->pagedir == NULL){
+    PANIC("palloc_frame 과정에서 예상 못한 일이 일어남");
+  }
   return frame;
 }
 
@@ -66,7 +69,9 @@ free_frame(void *kaddr)
 void
 _free_frame(struct frame* frame)
 {
-  pagedir_clear_page (frame->owner_thread->pagedir, frame->vme->vaddr);
+  if (frame->owner_thread->pagedir != NULL) {
+    pagedir_clear_page (frame->owner_thread->pagedir, frame->vme->vaddr);
+  }
   del_frame_from_frame_table(frame);
   palloc_free_page(frame->kaddr);
   free(frame);
