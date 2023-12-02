@@ -324,13 +324,16 @@ mmap (int fd, void *addr)
   struct mmap_file *mmap_file;
   size_t offset = 0;
   struct thread *cur = thread_current();
+  lock_acquire (&filesys_lock);
 
   if (is_user_vaddr(addr) == false || addr ==0 || pg_ofs(addr) != 0) {
+    lock_release (&filesys_lock);
     return -1;
   }
 
   mmap_file = malloc(sizeof(struct mmap_file));
   if (mmap_file == NULL) {
+    lock_release (&filesys_lock);
     return -1;
   }
 
@@ -338,6 +341,7 @@ mmap (int fd, void *addr)
   list_init (&mmap_file->vme_list);
   mmap_file->file = process_get_file(fd);
   if(mmap_file->file == NULL){
+    lock_release (&filesys_lock);
     return -1;
   }
 
@@ -348,6 +352,7 @@ mmap (int fd, void *addr)
   int length = file_length (mmap_file -> file);
   while (length > 0) {
     if (find_vme (addr)) {
+      lock_release (&filesys_lock);
       return -1;
     }
     
@@ -372,6 +377,7 @@ mmap (int fd, void *addr)
     length -= PGSIZE;
   }
 
+  lock_release (&filesys_lock);
   return mmap_file->map_id;
 }
 
@@ -382,11 +388,14 @@ munmap (mapid_t mapping)
   struct thread *cur = thread_current();
   struct mmap_file *mmap_file = NULL;
 
+  lock_acquire (&filesys_lock);
+
   if (mapping == CLOSE_ALL) {
     while (!list_empty(&cur->mmap_list)) {
       mmap_file = list_entry(list_pop_front(&cur->mmap_list), struct mmap_file, elem);
       do_munmap(mmap_file);
     }
+    lock_release (&filesys_lock);
     return;
   }
 
@@ -398,10 +407,12 @@ munmap (mapid_t mapping)
   }
   
   if (mmap_file == NULL){
+    lock_release (&filesys_lock);
     return;
   }
 
   do_munmap(mmap_file);
+  lock_release (&filesys_lock);
 }
 
 void
