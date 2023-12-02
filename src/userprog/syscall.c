@@ -424,7 +424,7 @@ do_munmap(struct mmap_file *mmap_file)
       }
     }
 
-    pagedir_clear_page(cur->pagedir, vme->vaddr);   // 두번 지우는 중복이 발생함
+    // pagedir_clear_page(cur->pagedir, vme->vaddr);   // 두번 지우는 중복이 발생함
     free_frame(kaddr);
 
     vme->is_loaded = false;
