@@ -426,7 +426,7 @@ do_munmap(struct mmap_file *mmap_file)
       }
     }
 
-    pagedir_clear_page(cur->pagedir, vme->vaddr);
+    // pagedir_clear_page(cur->pagedir, vme->vaddr);
     free_frame(kaddr);
 
     vme->is_loaded = false;

@@ -58,15 +58,16 @@ free_frame(void *kaddr)
     struct frame *temp_frame = list_entry (e, struct frame, ft_elem);
     if (temp_frame->kaddr == kaddr){
         _free_frame(temp_frame);
-        break;
+        return;
     }
   }
+  ASSERT("테이블에 없는 애를 지우려고 하는 상황");
 }
 
 void
 _free_frame(struct frame* frame)
 {
-  // pagedir_clear_page (frame->owner_thread->pagedir, frame->vme->vaddr);
+  pagedir_clear_page (frame->owner_thread->pagedir, frame->vme->vaddr);
   del_frame_from_frame_table(frame);
   palloc_free_page(frame->kaddr);
   free(frame);
@@ -114,8 +115,8 @@ lru_clock_algorithm(enum palloc_flags flags) {
   else {
     // ASSERT("lru_clock_algorithm: victim_page->type is not VM_ANON or VM_FILE");
   }
-  pagedir_clear_page (victim_frame->owner_thread->pagedir, victim_frame->vme->vaddr);
-  _free_frame(victim_frame);
+  // pagedir_clear_page (victim_frame->owner_thread->pagedir, victim_frame->vme->vaddr);
+  free_frame(victim_frame);
   // lock_release(&ft_lock);
   return palloc_get_page(flags);
 }
