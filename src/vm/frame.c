@@ -66,7 +66,7 @@ free_frame(void *kaddr)
 void
 _free_frame(struct frame* frame)
 {
-  pagedir_clear_page (frame->owner_thread->pagedir, frame->vme->vaddr);
+  // pagedir_clear_page (frame->owner_thread->pagedir, frame->vme->vaddr);
   del_frame_from_frame_table(frame);
   palloc_free_page(frame->kaddr);
   free(frame);
@@ -114,7 +114,7 @@ lru_clock_algorithm(enum palloc_flags flags) {
   else {
     // ASSERT("lru_clock_algorithm: victim_page->type is not VM_ANON or VM_FILE");
   }
-
+  pagedir_clear_page (victim_frame->owner_thread->pagedir, victim_frame->vme->vaddr);
   _free_frame(victim_frame);
   // lock_release(&ft_lock);
   return palloc_get_page(flags);

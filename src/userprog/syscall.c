@@ -410,14 +410,14 @@ do_munmap(struct mmap_file *mmap_file)
 {
   struct list_elem *e;
   struct thread *cur = thread_current();
-  void *addr;
+  void *kaddr;
 
   for (e = list_begin (&mmap_file->vme_list); e != list_end (&mmap_file->vme_list);/*list_next(e)*/) {
     struct vm_entry *vme = list_entry (e, struct vm_entry, mmap_elem);
     // struct list_elem *temp;
 
     if (vme->is_loaded == true) {
-      addr = pagedir_get_page(cur->pagedir, vme->vaddr);
+      kaddr = pagedir_get_page(cur->pagedir, vme->vaddr);
 
       if (pagedir_is_dirty(cur->pagedir, vme->vaddr) == true) {
         lock_acquire(&filesys_lock);
@@ -426,8 +426,8 @@ do_munmap(struct mmap_file *mmap_file)
       }
     }
 
-    // pagedir_clear_page(cur->pagedir, vme->vaddr);
-    free_frame(addr);
+    pagedir_clear_page(cur->pagedir, vme->vaddr);
+    free_frame(kaddr);
 
     vme->is_loaded = false;
     e = list_remove(e);
