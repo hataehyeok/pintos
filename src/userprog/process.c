@@ -557,7 +557,6 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
       vme->swap_slot = 0;
       vme->file = _file;
       insert_vme(&(thread_current()->vm_table), vme);
-      // mmap_elem에 넣는 것도 필요함
 
       /* Advance. */
       read_bytes -= page_read_bytes;
@@ -630,7 +629,8 @@ handle_mm_fault (struct vm_entry *vme)
   struct frame *new_frame = palloc_frame(PAL_USER);
   new_frame->vme = vme;
 
-  if (new_frame->kaddr == NULL) {
+  if (new_frame == NULL) {
+    ASSERT("palloc_frame에서 lru 알고리즘으로 받아오기 때문에 실패하면 안됨 아니면 위에서 malloc에서 터졌을 수도");
     return false;
   }
 
